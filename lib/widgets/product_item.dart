@@ -36,7 +36,7 @@ class ProductItem extends StatelessWidget {
           trailing: IconButton(
             onPressed: () {
               cart.addItem(
-                product.id,
+                product.id!,
                 product.price,
                 product.title,
               );
@@ -48,7 +48,7 @@ class ProductItem extends StatelessWidget {
                   action: SnackBarAction(
                     label: "Undo",
                     onPressed: () {
-                      cart.removeSingleItem(product.id);
+                      cart.removeSingleItem(product.id!);
                     },
                   ),
                 ),
