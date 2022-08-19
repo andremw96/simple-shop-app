@@ -32,7 +32,32 @@ class Order with ChangeNotifier {
 
   Future<void> fetchAndSetOrders() async {
     final respons = await http.get(_url);
-    print(json.decode(respons.body));
+    final List<OrderItem> loadedOrders = [];
+    final extractedData = json.decode(respons.body) as Map<String, dynamic>;
+    if (extractedData == null) {
+      return;
+    }
+    extractedData.forEach((key, value) {
+      loadedOrders.add(
+        OrderItem(
+          id: key,
+          amount: value["amount"],
+          products: (value["products"] as List<dynamic>)
+              .map(
+                (e) => CartItem(
+                  id: e['id'],
+                  title: e['title'],
+                  quantity: e['quantity'],
+                  price: e['price'],
+                ),
+              )
+              .toList(),
+          datetime: DateTime.parse(value["dateTime"]),
+        ),
+      );
+    });
+    _orders = loadedOrders.reversed.toList();
+    notifyListeners();
   }
 
   Future<void> addOrder(List<CartItem> cartProducts, double total) async {
