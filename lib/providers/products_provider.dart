@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:shop_app/providers/product.dart';
@@ -89,9 +90,23 @@ class ProductsProvider with ChangeNotifier {
     }
   }
 
-  void deleteProduct(String productId) {
-    _items.removeWhere((element) => element.id == productId);
+  Future<void> deleteProduct(String productId) async {
+    final url = Uri.https(
+      "simple-shop-app-48eff-default-rtdb.asia-southeast1.firebasedatabase.app",
+      "/products/$productId.jsonss",
+    );
+    final existingProductIndex =
+        _items.indexWhere((element) => element.id == productId);
+    Product? existingProduct = _items[existingProductIndex];
+    _items.removeAt(existingProductIndex);
     notifyListeners();
+    final response = await http.delete(url);
+    if (response.statusCode >= 400) {
+      _items.insert(existingProductIndex, existingProduct);
+      notifyListeners();
+      throw const HttpException("could not delete product.");
+    }
+    existingProduct = null;
   }
 
   List<Product> get favoriteItems {
