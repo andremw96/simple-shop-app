@@ -17,9 +17,11 @@ class ProductsProvider with ChangeNotifier {
 
   ProductsProvider(this.authToken, this.userId, this._items);
 
-  Future<void> fetchAndSetProducts() async {
+  Future<void> fetchAndSetProducts([bool filterByUser = false]) async {
+    final filterString =
+        filterByUser ? 'orderBy="creatorId"&equalTo="$userId"' : '';
     var _url = Uri.parse(
-        "https://simple-shop-app-48eff-default-rtdb.asia-southeast1.firebasedatabase.app/products.json?auth=$authToken");
+        'https://simple-shop-app-48eff-default-rtdb.asia-southeast1.firebasedatabase.app/products.json?auth=$authToken&$filterString');
     try {
       final response = await http.get(_url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
@@ -60,6 +62,7 @@ class ProductsProvider with ChangeNotifier {
             "description": product.description,
             "imageUrl": product.imageUrl,
             "price": product.price,
+            "creatorId": userId,
           }));
 
       final newProduct = Product(
