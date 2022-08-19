@@ -37,22 +37,27 @@ class MyApp extends StatelessWidget {
           create: (context) => Auth(),
         ),
       ],
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          accentColor: Colors.deepOrange,
-          fontFamily: 'Lato',
-        ),
-        home: AuthScreen(),
-        routes: {
-          ProductDetailScreen.routeName: (ctx) => const ProductDetailScreen(),
-          CartScreen.routeName: (context) => const CartScreen(),
-          OrdersScreen.routeName: (context) => const OrdersScreen(),
-          UserProductsScreen.routeName: (context) => const UserProductsScreen(),
-          EditProductScreen.routeName: (context) => const EditProductScreen(),
-        },
-      ),
+      child: Consumer<Auth>(
+          builder: (ctx, auth, _) => MaterialApp(
+                title: 'Flutter Demo',
+                theme: ThemeData(
+                  primarySwatch: Colors.blue,
+                  accentColor: Colors.deepOrange,
+                  fontFamily: 'Lato',
+                ),
+                home:
+                    auth.isAuth ? const ProductOverviewScreen() : AuthScreen(),
+                routes: {
+                  ProductDetailScreen.routeName: (ctx) =>
+                      const ProductDetailScreen(),
+                  CartScreen.routeName: (context) => const CartScreen(),
+                  OrdersScreen.routeName: (context) => const OrdersScreen(),
+                  UserProductsScreen.routeName: (context) =>
+                      const UserProductsScreen(),
+                  EditProductScreen.routeName: (context) =>
+                      const EditProductScreen(),
+                },
+              )),
     );
   }
 }

@@ -162,6 +162,7 @@ class _AuthCardState extends State<AuthCard> {
 
       _showErrorDialog(errorMessage);
     } catch (error) {
+      print(error.toString());
       const errorMessage = "could not authenticate you. please try again later";
       _showErrorDialog(errorMessage);
     }
