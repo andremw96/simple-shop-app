@@ -11,36 +11,34 @@ class ProductsProvider with ChangeNotifier {
     return [..._items];
   }
 
-  Future<void> addProduct(Product product) {
+  Future<void> addProduct(Product product) async {
     var url = Uri.https(
-      "simple-shop-app-48eff-default-rtdb.asia-southeast1.firebasedatabase",
+      "simple-shop-app-48eff-default-rtdb.asia-southeast1.firebasedatabase.app",
       "/products.json",
     );
 
-    return http
-        .post(url,
-            body: json.encode({
-              "title": product.title,
-              "description": product.description,
-              "imageUrl": product.imageUrl,
-              "price": product.price,
-              "isFavorite": product.isFavorite,
-            }))
-        .then(
-      (response) {
-        final newProduct = Product(
-          id: DateTime.now().toString(),
-          title: product.title,
-          description: product.description,
-          price: product.price,
-          imageUrl: product.imageUrl,
-        );
-        _items.add(newProduct);
-        notifyListeners();
-      },
-    ).catchError((error) {
-      throw error;
-    });
+    try {
+      final response = await http.post(url,
+          body: json.encode({
+            "title": product.title,
+            "description": product.description,
+            "imageUrl": product.imageUrl,
+            "price": product.price,
+            "isFavorite": product.isFavorite,
+          }));
+
+      final newProduct = Product(
+        id: DateTime.now().toString(),
+        title: product.title,
+        description: product.description,
+        price: product.price,
+        imageUrl: product.imageUrl,
+      );
+      _items.add(newProduct);
+      notifyListeners();
+    } catch (error) {
+      rethrow;
+    }
   }
 
   void updateProduct(String productId, Product product) {
