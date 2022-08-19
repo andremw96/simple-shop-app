@@ -13,11 +13,12 @@ class ProductsProvider with ChangeNotifier {
   }
 
   String authToken;
+  String userId;
 
-  ProductsProvider(this.authToken, this._items);
+  ProductsProvider(this.authToken, this.userId, this._items);
 
   Future<void> fetchAndSetProducts() async {
-    final _url = Uri.parse(
+    var _url = Uri.parse(
         "https://simple-shop-app-48eff-default-rtdb.asia-southeast1.firebasedatabase.app/products.json?auth=$authToken");
     try {
       final response = await http.get(_url);
@@ -25,6 +26,10 @@ class ProductsProvider with ChangeNotifier {
       if (extractedData == null) {
         return;
       }
+      _url = Uri.parse(
+          "https://simple-shop-app-48eff-default-rtdb.asia-southeast1.firebasedatabase.app/userFavorites/$userId.json?auth=$authToken");
+      final favoriteResposne = await http.get(_url);
+      final favoriteData = json.decode(favoriteResposne.body);
       final List<Product> loadedProducts = [];
       extractedData.forEach((prodId, prodData) {
         loadedProducts.add(Product(
@@ -33,7 +38,8 @@ class ProductsProvider with ChangeNotifier {
           description: prodData['description'],
           price: prodData['price'],
           imageUrl: prodData['imageUrl'],
-          isFavorite: prodData['isFavorite'],
+          isFavorite:
+              favoriteData == null ? false : favoriteData[prodId] ?? false,
         ));
       });
       _items = loadedProducts;
@@ -54,7 +60,6 @@ class ProductsProvider with ChangeNotifier {
             "description": product.description,
             "imageUrl": product.imageUrl,
             "price": product.price,
-            "isFavorite": product.isFavorite,
           }));
 
       final newProduct = Product(
