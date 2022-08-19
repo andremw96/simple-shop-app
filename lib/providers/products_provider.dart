@@ -11,14 +11,36 @@ class ProductsProvider with ChangeNotifier {
     return [..._items];
   }
 
-  Future<void> addProduct(Product product) async {
-    var url = Uri.https(
-      "simple-shop-app-48eff-default-rtdb.asia-southeast1.firebasedatabase.app",
-      "/products.json",
-    );
+  var _url = Uri.https(
+    "simple-shop-app-48eff-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "/products.json",
+  );
 
+  Future<void> fetchAndSetProducts() async {
     try {
-      final response = await http.post(url,
+      final response = await http.get(_url);
+      final extractedData = json.decode(response.body) as Map<String, dynamic>;
+      final List<Product> loadedProducts = [];
+      extractedData.forEach((prodId, prodData) {
+        loadedProducts.add(Product(
+          id: prodId,
+          title: prodData['title'],
+          description: prodData['description'],
+          price: prodData['price'],
+          imageUrl: prodData['imageUrl'],
+          isFavorite: prodData['isFavorite'],
+        ));
+      });
+      _items = loadedProducts;
+      notifyListeners();
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  Future<void> addProduct(Product product) async {
+    try {
+      final response = await http.post(_url,
           body: json.encode({
             "title": product.title,
             "description": product.description,
