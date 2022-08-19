@@ -20,15 +20,13 @@ class Product with ChangeNotifier {
     this.isFavorite = false,
   });
 
-  Future<void> toggleFavoriteStatus() async {
+  Future<void> toggleFavoriteStatus(String authToken) async {
     final oldStatus = isFavorite;
     isFavorite = !isFavorite;
     notifyListeners();
 
-    final url = Uri.https(
-      "simple-shop-app-48eff-default-rtdb.asia-southeast1.firebasedatabase.app",
-      "/products/$id.json",
-    );
+    final url = Uri.parse(
+        "https://simple-shop-app-48eff-default-rtdb.asia-southeast1.firebasedatabase.app/products/$id.json?auth=$authToken");
 
     try {
       final response = await http.patch(

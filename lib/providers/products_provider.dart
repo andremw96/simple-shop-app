@@ -12,12 +12,13 @@ class ProductsProvider with ChangeNotifier {
     return [..._items];
   }
 
-  final _url = Uri.https(
-    "simple-shop-app-48eff-default-rtdb.asia-southeast1.firebasedatabase.app",
-    "/products.json",
-  );
+  String authToken;
+
+  ProductsProvider(this.authToken, this._items);
 
   Future<void> fetchAndSetProducts() async {
+    final _url = Uri.parse(
+        "https://simple-shop-app-48eff-default-rtdb.asia-southeast1.firebasedatabase.app/products.json?auth=$authToken");
     try {
       final response = await http.get(_url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
@@ -43,6 +44,9 @@ class ProductsProvider with ChangeNotifier {
   }
 
   Future<void> addProduct(Product product) async {
+    final _url = Uri.parse(
+        "https://simple-shop-app-48eff-default-rtdb.asia-southeast1.firebasedatabase.app/products.json?auth=$authToken");
+
     try {
       final response = await http.post(_url,
           body: json.encode({
@@ -72,10 +76,8 @@ class ProductsProvider with ChangeNotifier {
         _items.indexWhere((element) => element.id == productId);
 
     if (productIndex >= 0) {
-      final url = Uri.https(
-        "simple-shop-app-48eff-default-rtdb.asia-southeast1.firebasedatabase.app",
-        "/products/$productId.json",
-      );
+      final url = Uri.parse(
+          "https://simple-shop-app-48eff-default-rtdb.asia-southeast1.firebasedatabase.app/products/$productId.json?auth=$authToken");
       await http.patch(
         url,
         body: json.encode(
@@ -94,10 +96,8 @@ class ProductsProvider with ChangeNotifier {
   }
 
   Future<void> deleteProduct(String productId) async {
-    final url = Uri.https(
-      "simple-shop-app-48eff-default-rtdb.asia-southeast1.firebasedatabase.app",
-      "/products/$productId.jsonss",
-    );
+    final url = Uri.parse(
+        "https://simple-shop-app-48eff-default-rtdb.asia-southeast1.firebasedatabase.app/products/$productId.json?auth=$authToken");
     final existingProductIndex =
         _items.indexWhere((element) => element.id == productId);
     Product? existingProduct = _items[existingProductIndex];
