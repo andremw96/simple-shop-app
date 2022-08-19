@@ -11,7 +11,7 @@ class ProductsProvider with ChangeNotifier {
     return [..._items];
   }
 
-  var _url = Uri.https(
+  final _url = Uri.https(
     "simple-shop-app-48eff-default-rtdb.asia-southeast1.firebasedatabase.app",
     "/products.json",
   );
@@ -63,11 +63,27 @@ class ProductsProvider with ChangeNotifier {
     }
   }
 
-  void updateProduct(String productId, Product product) {
+  Future<void> updateProduct(String productId, Product product) async {
     final productIndex =
         _items.indexWhere((element) => element.id == productId);
 
     if (productIndex >= 0) {
+      final url = Uri.https(
+        "simple-shop-app-48eff-default-rtdb.asia-southeast1.firebasedatabase.app",
+        "/products/$productId.json",
+      );
+      await http.patch(
+        url,
+        body: json.encode(
+          {
+            "title": product.title,
+            "description": product.description,
+            "imageUrl": product.imageUrl,
+            "price": product.price,
+          },
+        ),
+      );
+
       _items[productIndex] = product;
       notifyListeners();
     }
