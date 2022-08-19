@@ -14,6 +14,11 @@ class UserProductsScreen extends StatelessWidget {
 
   static const routeName = "/user-product";
 
+  Future<void> _refreshProducts(BuildContext context) async {
+    await Provider.of<ProductsProvider>(context, listen: false)
+        .fetchAndSetProducts();
+  }
+
   @override
   Widget build(BuildContext context) {
     final products = Provider.of<ProductsProvider>(context);
@@ -31,19 +36,22 @@ class UserProductsScreen extends StatelessWidget {
           )
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8),
-        child: ListView.builder(
-          itemCount: products.items.length,
-          itemBuilder: (ctx, i) => Column(
-            children: [
-              UserProductItem(
-                id: products.items[i].id!,
-                title: products.items[i].title,
-                imageUrl: products.items[i].imageUrl,
-              ),
-              const Divider(),
-            ],
+      body: RefreshIndicator(
+        onRefresh: () => _refreshProducts(context),
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: ListView.builder(
+            itemCount: products.items.length,
+            itemBuilder: (ctx, i) => Column(
+              children: [
+                UserProductItem(
+                  id: products.items[i].id!,
+                  title: products.items[i].title,
+                  imageUrl: products.items[i].imageUrl,
+                ),
+                const Divider(),
+              ],
+            ),
           ),
         ),
       ),
